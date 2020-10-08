@@ -70,10 +70,6 @@
       <Project>{825e7a10-390c-4a2b-b3a8-491d14966912}</Project>
       <Name>MissionPlanner.Comms</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)ExtLibs\Controls\MissionPlanner.Controls.csproj">
-      <Project>{c8b88795-6d01-494d-83ad-6944bd4c5023}</Project>
-      <Name>MissionPlanner.Controls</Name>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)ExtLibs\GeoUtility\GeoUtility.csproj">
       <Project>{7f7994ce-823f-4a04-bbea-d0a3808ff56d}</Project>
       <Name>GeoUtility</Name>
@@ -90,8 +86,24 @@
       <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
       <Name>MissionPlanner.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\mp-plugin-dev\ExtLibs\Controls\MissionPlanner.Controls.csproj">
+      <Project>{c8b88795-6d01-494d-83ad-6944bd4c5023}</Project>
+      <Name>MissionPlanner.Controls</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ParamDiff.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ParamDiff.Designer.cs">
+      <DependentUpon>ParamDiff.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewVaultFile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewVaultFile.Designer.cs">
+      <DependentUpon>NewVaultFile.cs</DependentUpon>
+    </Compile>
     <Compile Include="RACParamVault.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -108,11 +120,21 @@
       <HintPath>$(SolutionDir)packages\SharpDX.DirectInput.4.1.0\lib\net45\SharpDX.DirectInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="NewVaultFile.resx">
+      <DependentUpon>NewVaultFile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ParamDiff.resx">
+      <DependentUpon>ParamDiff.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,34 +1,40 @@
-﻿using MissionPlanner.Utilities;
+﻿using MissionPlanner.Controls;
+using MissionPlanner.Utilities;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
 using System.Diagnostics;
-using MissionPlanner.Controls.PreFlight;
-using MissionPlanner.Controls;
+using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace MissionPlanner.RACParamVault
 {
     public class RACParamVaultPlugin : MissionPlanner.Plugin.Plugin
     {
-        private string vehicle_name;                //Marked with ! in the vault file
-        private string vehicle_configuration;       //Marked with @ in the vault file
-        private string operator_name;               //Marked with ~ in the vault file
+        public string vehicle_name;                //Marked with ! in the vault file
+        public string vehicle_configuration;       //Marked with @ in the vault file
+        public string operator_name;               //Marked with ~ in the vault file
 
-        private Dictionary<String, double> _actual_parameters = new Dictionary<string, double>();       //This will contains the actual parameter list from the vehicle
-        private Dictionary<String, double> _vault_parameters = new Dictionary<string, double>();       //This will contains the actual parameter list from the vehicle
+        public Dictionary<string, double> _actual_parameters = new Dictionary<string, double>();       //This will contains the actual parameter list from the vehicle
+        public Dictionary<string, double> _vault_parameters = new Dictionary<string, double>();       //This will contains the actual parameter list from the vehicle
+       
+        
+        public IEnumerable<KeyValuePair<string, double>> _differences = new Dictionary<string, double>();
+        
+        
         private ToolStripMenuItem but;
 
-        Stopwatch stopwatch = new Stopwatch();
+        private Stopwatch stopwatch = new Stopwatch();
+
         /// <summary>
         /// The vault contect is loaded for the actual vehicle
         /// </summary>
         private bool _vault_loaded = false;
+
         /// <summary>
         /// Vault is ignored, do not askt till next connect
         /// </summary>
-        private bool _vault_ignored = false;
+        public bool _vault_ignored = false;
 
         public override string Name
         {
@@ -60,22 +66,21 @@ namespace MissionPlanner.RACParamVault
             ToolStripItemCollection col = Host.FDMenuMap.Items;
             col.Add(but);
 
-            vehicle_name = "GigaCopter 6";
-            vehicle_configuration = "OVIT Kabelbehuzo";
+            vehicle_name = "GigaRotor 6 v1";
+            vehicle_configuration = Host.config["MPConfigDesc", "Default"];
+            if (vehicle_configuration?.Length == 0) vehicle_configuration = "Default";
 
             return true;
         }
 
         public override bool Loop()
         {
-
             //if we are not connected then we skip
             if (!MainV2.comPort.MAV.cs.connected)
             {
                 _vault_loaded = false; //
                 _vault_ignored = false;
                 return true;
-
             }
             //If we connected and armed we also skip
             if (MainV2.comPort.MAV.cs.armed) { Console.WriteLine("MAV is armed skipped vault checking"); return true; }
@@ -119,13 +124,18 @@ namespace MissionPlanner.RACParamVault
                 //We have a loaded_vault file now.
                 update_actual_parameter_list(); //Update current parameters
 
-                var diff = _actual_parameters.Except(_vault_parameters);
+                _differences = _actual_parameters.Except(_vault_parameters);
 
-                if (diff.Count() != 0)
+                if (_differences.Count() != 0)              // There are differences in the actual config and the Vault
                 {
-                    CustomMessageBox.Show("Config changed !");
+                    using (Form ParamDiff = new ParamDiff(this))
+                    {
+                        MissionPlanner.Utilities.ThemeManager.ApplyThemeTo(ParamDiff);
+                        
+                        ParamDiff.ShowDialog();
+                    }
+                    //CustomMessageBox.Show("Config changed !");
                 }
-
             }
 
             return true;
@@ -192,7 +202,6 @@ namespace MissionPlanner.RACParamVault
 
         private void update_actual_parameter_list()
         {
-
             //Check if all params are loaded
             if (MainV2.comPort.MAV.param.TotalReceived < MainV2.comPort.MAV.param.TotalReported) return;
 
@@ -207,17 +216,15 @@ namespace MissionPlanner.RACParamVault
                 if (is_param_readonly(item))
                     continue;
 
-                var value = Math.Round(MainV2.comPort.MAV.param[item].Value,5); //Rounding for 6 decimal digits to overcome stupid double conversion errors.
+                var value = Math.Round(MainV2.comPort.MAV.param[item].Value, 5); //Rounding for 6 decimal digits to overcome stupid double conversion errors.
                 _actual_parameters.Add(item, value);
             }
-
         }
+
         private void but_Click(object sender, EventArgs e)
         {
             update_actual_parameter_list();
         }
-
-
 
         private void create_vault_file()
         {
@@ -245,7 +252,6 @@ namespace MissionPlanner.RACParamVault
                 sw.WriteLine("!" + vehicle_name);
                 sw.WriteLine("@" + vehicle_configuration);
                 sw.WriteLine("~" + operator_name);
-                
 
                 foreach (string value in list)
                 {
@@ -279,7 +285,6 @@ namespace MissionPlanner.RACParamVault
                         continue;
                     if (line.StartsWith("~"))
                         continue;
-
 
                     string[] items = line.Split(new char[] { ' ', ',', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
