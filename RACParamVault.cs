@@ -223,7 +223,12 @@ namespace MissionPlanner.RACParamVault
 
         private void but_Click(object sender, EventArgs e)
         {
-            update_actual_parameter_list();
+            using (Form NewVaultFile = new NewVaultFile(this))
+            {
+                MissionPlanner.Utilities.ThemeManager.ApplyThemeTo(NewVaultFile);
+                NewVaultFile.ShowDialog();
+                Console.WriteLine(NewVaultFile.DialogResult);
+            }
         }
 
         private void create_vault_file()
