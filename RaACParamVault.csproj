@@ -50,7 +50,11 @@
       <Project>{9ca367b8-0b98-49d1-84fb-735e612e3ba9}</Project>
       <Name>BSE.Windows.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)ExtLibs\Core\Core.csproj">
+    <ProjectReference Include="..\mp-plugin-dev\ExtLibs\Controls\MissionPlanner.Controls.csproj">
+      <Project>{c8b88795-6d01-494d-83ad-6944bd4c5023}</Project>
+      <Name>MissionPlanner.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\00GIT\mp-plugin-dev\ExtLibs\Core\Core.csproj">
       <Project>{59129078-7b12-4198-b93e-0aa08d0bb7ed}</Project>
       <Name>Core</Name>
     </ProjectReference>
@@ -58,15 +62,15 @@
       <Project>{13d2ec90-c41f-48a1-aada-859b6dc24edc}</Project>
       <Name>MAVLink</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)MissionPlanner.csproj">
+    <ProjectReference Include="D:\00GIT\mp-plugin-dev\MissionPlanner.csproj">
       <Project>{a2e22272-95fe-47b6-b050-9ae7e2055bf5}</Project>
       <Name>MissionPlanner</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)ExtLibs\ArduPilot\MissionPlanner.ArduPilot.csproj">
+    <ProjectReference Include="D:\00GIT\mp-plugin-dev\ExtLibs\ArduPilot\MissionPlanner.ArduPilot.csproj">
       <Project>{ca6345d3-7a6d-478b-a0ed-a58e50dcaa83}</Project>
       <Name>MissionPlanner.ArduPilot</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)ExtLibs\Comms\MissionPlanner.Comms.csproj">
+    <ProjectReference Include="D:\00GIT\mp-plugin-dev\ExtLibs\Comms\MissionPlanner.Comms.csproj">
       <Project>{825e7a10-390c-4a2b-b3a8-491d14966912}</Project>
       <Name>MissionPlanner.Comms</Name>
     </ProjectReference>
@@ -74,21 +78,17 @@
       <Project>{7f7994ce-823f-4a04-bbea-d0a3808ff56d}</Project>
       <Name>GeoUtility</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)ExtLibs\GMap.NET.Core\GMap.NET.Core.csproj">
+    <ProjectReference Include="D:\00GIT\mp-plugin-dev\ExtLibs\GMap.NET.Core\GMap.NET.Core.csproj">
       <Project>{d0c39d9d-bed0-418b-9a5e-713176caf40c}</Project>
       <Name>GMap.NET.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)ExtLibs\GMap.NET.WindowsForms\GMap.NET.WindowsForms.csproj">
+    <ProjectReference Include="D:\00GIT\mp-plugin-dev\ExtLibs\GMap.NET.WindowsForms\GMap.NET.WindowsForms.csproj">
       <Project>{e06def77-f933-42fb-afd7-db2d0d8d6a98}</Project>
       <Name>GMap.NET.WindowsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)ExtLibs\Utilities\MissionPlanner.Utilities.csproj">
+    <ProjectReference Include="D:\00GIT\mp-plugin-dev\ExtLibs\Utilities\MissionPlanner.Utilities.csproj">
       <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
       <Name>MissionPlanner.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\mp-plugin-dev\ExtLibs\Controls\MissionPlanner.Controls.csproj">
-      <Project>{c8b88795-6d01-494d-83ad-6944bd4c5023}</Project>
-      <Name>MissionPlanner.Controls</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

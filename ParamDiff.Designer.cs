@@ -33,9 +33,11 @@
             this.value_on_vehicle = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.value_in_vault = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label1 = new System.Windows.Forms.Label();
-            this.myButton1 = new MissionPlanner.Controls.MyButton();
-            this.myButton2 = new MissionPlanner.Controls.MyButton();
-            this.myButton3 = new MissionPlanner.Controls.MyButton();
+            this.bUpdateVehicle = new MissionPlanner.Controls.MyButton();
+            this.bUpdate_Vault = new MissionPlanner.Controls.MyButton();
+            this.bIgnore = new MissionPlanner.Controls.MyButton();
+            this.tbOperator = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgwParams)).BeginInit();
             this.SuspendLayout();
             // 
@@ -51,10 +53,10 @@
             this.parameter,
             this.value_on_vehicle,
             this.value_in_vault});
-            this.dgwParams.Location = new System.Drawing.Point(12, 128);
+            this.dgwParams.Location = new System.Drawing.Point(12, 169);
             this.dgwParams.Name = "dgwParams";
             this.dgwParams.ReadOnly = true;
-            this.dgwParams.Size = new System.Drawing.Size(547, 284);
+            this.dgwParams.Size = new System.Drawing.Size(547, 243);
             this.dgwParams.TabIndex = 0;
             // 
             // parameter
@@ -91,42 +93,62 @@
             this.label1.Text = "label1";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // myButton1
+            // bUpdateVehicle
             // 
-            this.myButton1.Location = new System.Drawing.Point(13, 93);
-            this.myButton1.Name = "myButton1";
-            this.myButton1.Size = new System.Drawing.Size(111, 23);
-            this.myButton1.TabIndex = 2;
-            this.myButton1.Text = "UPDATE Vehicle";
-            this.myButton1.UseVisualStyleBackColor = true;
+            this.bUpdateVehicle.Location = new System.Drawing.Point(13, 93);
+            this.bUpdateVehicle.Name = "bUpdateVehicle";
+            this.bUpdateVehicle.Size = new System.Drawing.Size(111, 23);
+            this.bUpdateVehicle.TabIndex = 2;
+            this.bUpdateVehicle.Text = "UPDATE Vehicle";
+            this.bUpdateVehicle.UseVisualStyleBackColor = true;
+            this.bUpdateVehicle.Click += new System.EventHandler(this.bUpdateVehicle_Click);
             // 
-            // myButton2
+            // bUpdate_Vault
             // 
-            this.myButton2.Location = new System.Drawing.Point(230, 92);
-            this.myButton2.Name = "myButton2";
-            this.myButton2.Size = new System.Drawing.Size(111, 23);
-            this.myButton2.TabIndex = 3;
-            this.myButton2.Text = "Update VAULT";
-            this.myButton2.UseVisualStyleBackColor = true;
+            this.bUpdate_Vault.Location = new System.Drawing.Point(230, 92);
+            this.bUpdate_Vault.Name = "bUpdate_Vault";
+            this.bUpdate_Vault.Size = new System.Drawing.Size(111, 23);
+            this.bUpdate_Vault.TabIndex = 3;
+            this.bUpdate_Vault.Text = "Update VAULT";
+            this.bUpdate_Vault.UseVisualStyleBackColor = true;
+            this.bUpdate_Vault.Click += new System.EventHandler(this.bUpdate_Vault_Click);
             // 
-            // myButton3
+            // bIgnore
             // 
-            this.myButton3.Location = new System.Drawing.Point(447, 93);
-            this.myButton3.Name = "myButton3";
-            this.myButton3.Size = new System.Drawing.Size(111, 23);
-            this.myButton3.TabIndex = 4;
-            this.myButton3.Text = "IGNORE";
-            this.myButton3.UseVisualStyleBackColor = true;
-            this.myButton3.Click += new System.EventHandler(this.myButton3_Click_1);
+            this.bIgnore.Location = new System.Drawing.Point(447, 93);
+            this.bIgnore.Name = "bIgnore";
+            this.bIgnore.Size = new System.Drawing.Size(111, 23);
+            this.bIgnore.TabIndex = 4;
+            this.bIgnore.Text = "IGNORE";
+            this.bIgnore.UseVisualStyleBackColor = true;
+            this.bIgnore.Click += new System.EventHandler(this.bIgnore_Click);
+            // 
+            // tbOperator
+            // 
+            this.tbOperator.Location = new System.Drawing.Point(69, 134);
+            this.tbOperator.Name = "tbOperator";
+            this.tbOperator.Size = new System.Drawing.Size(148, 20);
+            this.tbOperator.TabIndex = 5;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 137);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(51, 13);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Operator:";
             // 
             // ParamDiff
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(570, 420);
-            this.Controls.Add(this.myButton3);
-            this.Controls.Add(this.myButton2);
-            this.Controls.Add(this.myButton1);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.tbOperator);
+            this.Controls.Add(this.bIgnore);
+            this.Controls.Add(this.bUpdate_Vault);
+            this.Controls.Add(this.bUpdateVehicle);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.dgwParams);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -134,6 +156,7 @@
             this.Text = "Parameter missmatch ";
             ((System.ComponentModel.ISupportInitialize)(this.dgwParams)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -144,8 +167,10 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn value_on_vehicle;
         private System.Windows.Forms.DataGridViewTextBoxColumn value_in_vault;
         private System.Windows.Forms.Label label1;
-        private Controls.MyButton myButton1;
-        private Controls.MyButton myButton2;
-        private Controls.MyButton myButton3;
+        private Controls.MyButton bUpdateVehicle;
+        private Controls.MyButton bUpdate_Vault;
+        private Controls.MyButton bIgnore;
+        private System.Windows.Forms.TextBox tbOperator;
+        private System.Windows.Forms.Label label2;
     }
 }

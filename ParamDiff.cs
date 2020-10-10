@@ -14,17 +14,12 @@ namespace MissionPlanner.RACParamVault
             InitializeComponent();
             this.plugin = plugin;
 
-            foreach (KeyValuePair<string, double> entry in plugin._differences)
+            foreach (KeyValuePair<string, ParamPair> entry in plugin._diff)
             {
-                var inVault = plugin._vault_parameters[entry.Key].ToString();
-                dgwParams.Rows.Add(entry.Key, entry.Value.ToString(), inVault);
+                dgwParams.Rows.Add(entry.Key, entry.Value.inVehicle.ToString(), entry.Value.inVault.ToString());
             }
 
-            //for (int i = 0; i < 35; i++)
-            var i = 1;
-            dgwParams.Rows.Add(i.ToString(), i.ToString(), i.ToString());
-
-            this.Height = (dgwParams.PreferredSize.Height + 150) > 600 ? 600 : (dgwParams.PreferredSize.Height + 150);
+            this.Height = (dgwParams.PreferredSize.Height + 190) > 600 ? 600 : (dgwParams.PreferredSize.Height + 190);
             Console.WriteLine(this.Height);
 
             label1.Text = "Parameters stored in the vault for this vehicle " +
@@ -33,11 +28,37 @@ namespace MissionPlanner.RACParamVault
                           " Vehicle name:" + plugin.vehicle_name + " Config:" + plugin.vehicle_configuration;
         }
 
-    
-
-        private void myButton3_Click_1(object sender, EventArgs e)
+        private void bIgnore_Click(object sender, EventArgs e)
         {
             plugin._vault_ignored = true;
+            this.Close();
+        }
+
+        private void bUpdateVehicle_Click(object sender, EventArgs e)
+        {
+            if (tbOperator.Text.Length == 0)
+            {
+                label2.ForeColor = Color.Red;
+                return;
+            }
+            plugin.operator_name = tbOperator.Text;
+            plugin.UpdateParamsOnVehicle();
+            plugin.WriteChangeLog(Changelog.UpdateVehicle);
+            this.Close();
+
+        }
+
+        private void bUpdate_Vault_Click(object sender, EventArgs e)
+        {
+            if (tbOperator.Text.Length == 0)
+            {
+                label2.ForeColor = Color.Red;
+                return;
+            }
+            plugin.operator_name = tbOperator.Text;
+            plugin.CreateVaultFile(); //TODO: Add error handling
+            plugin.LoadVaultFile();
+            plugin.WriteChangeLog(Changelog.UpdateVault);
             this.Close();
         }
     }

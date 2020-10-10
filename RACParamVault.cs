@@ -1,5 +1,7 @@
 ﻿using MissionPlanner.Controls;
 using MissionPlanner.Utilities;
+using OpenTK.Graphics.ES11;
+using OpenTK.Graphics.ES20;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,6 +11,20 @@ using System.Windows.Forms;
 
 namespace MissionPlanner.RACParamVault
 {
+    public class ParamPair
+    {
+        public double inVehicle { set; get; }
+        public double inVault { set; get; }
+    }
+
+    public enum Changelog
+    {
+        NewVaultFile = 0,
+        UpdateVehicle = 1,
+        UpdateVault = 2
+    }
+
+
     public class RACParamVaultPlugin : MissionPlanner.Plugin.Plugin
     {
         public string vehicle_name;                //Marked with ! in the vault file
@@ -17,11 +33,13 @@ namespace MissionPlanner.RACParamVault
 
         public Dictionary<string, double> _actual_parameters = new Dictionary<string, double>();       //This will contains the actual parameter list from the vehicle
         public Dictionary<string, double> _vault_parameters = new Dictionary<string, double>();       //This will contains the actual parameter list from the vehicle
+        public Dictionary<string, double> _params_to_update = new Dictionary<string, double>();
        
         
-        public IEnumerable<KeyValuePair<string, double>> _differences = new Dictionary<string, double>();
-        
-        
+        //public IEnumerable<KeyValuePair<string, double>> _differences = new Dictionary<string, double>();
+
+        public Dictionary<string, ParamPair> _diff = new Dictionary<string, ParamPair>();        
+
         private ToolStripMenuItem but;
 
         private Stopwatch stopwatch = new Stopwatch();
@@ -98,64 +116,89 @@ namespace MissionPlanner.RACParamVault
                 string filename = Settings.GetUserDataDirectory() + Path.GetFileNameWithoutExtension(Settings.FileName) + "_" + MainV2.comPort.MAV.param["BRD_SERIAL_NUM"].Value.ToString() + ".paramvault";
                 if (!File.Exists(filename))
                 {
-                    Console.WriteLine("No vault file exists");
-                    if (CustomMessageBox.Show("No Vault file find for config:" + Settings.FileName + "/BRD_SERIAL:" + MainV2.comPort.MAV.param["BRD_SERIAL_NUM"].Value.ToString() + "\r\nDo you want to register current config in the vault?",
-                        "No Vault file", CustomMessageBox.MessageBoxButtons.YesNo, CustomMessageBox.MessageBoxIcon.Question) == CustomMessageBox.DialogResult.No)
+                    using (Form NewVaultFile = new NewVaultFile(this))
                     {
-                        _vault_ignored = true;
-                        return true;
+                        MissionPlanner.Utilities.ThemeManager.ApplyThemeTo(NewVaultFile);
+                        NewVaultFile.ShowDialog();
+                        if ((NewVaultFile.DialogResult == DialogResult.No) || (NewVaultFile.DialogResult == DialogResult.Cancel))
+                        {
+                            _vault_ignored = true;
+                            return true;
+                        }
+                        else
+                        {
+                            CreateVaultFile();
+                            LoadVaultFile();        //TODO: add error handling
+                            WriteChangeLog(Changelog.NewVaultFile);   //Update Changelog with the new vaultfile (for reference all params are stored at the begining)
+                            _vault_loaded = true;
+
+                        }
                     }
-                    InputBox.Show("Config Vault", "Please enter the name for vehicle", ref vehicle_name);
-                    InputBox.Show("Config Vault", "Please enter a description for this configuration", ref vehicle_configuration);
-                    InputBox.Show("Config Vault", "Please enter the name of the operator", ref operator_name);
-                    create_vault_file();
-                    loadParamFile();        //TODO: add error handling
-                    _vault_loaded = true;
                 }
                 else
                 {
                     Console.WriteLine("Load vault file");
-                    loadParamFile();        //TODO: add error handling
+                    LoadVaultFile();        //TODO: add error handling
                     _vault_loaded = true;
                 }
             }
             else
             {
                 //We have a loaded_vault file now.
-                update_actual_parameter_list(); //Update current parameters
+                GetParamsFromVehicle(); //Update current parameters
 
-                _differences = _actual_parameters.Except(_vault_parameters);
+                //var _differences = _actual_parameters.Except(_vault_parameters);
 
-                if (_differences.Count() != 0)              // There are differences in the actual config and the Vault
+                if (CompareParamsWithVault())              // There are differences in the actual config and the Vault
+
                 {
                     using (Form ParamDiff = new ParamDiff(this))
                     {
                         MissionPlanner.Utilities.ThemeManager.ApplyThemeTo(ParamDiff);
-                        
                         ParamDiff.ShowDialog();
                     }
-                    //CustomMessageBox.Show("Config changed !");
                 }
             }
 
             return true;
         }
+        /// <summary>
+        /// Compare parameters in _actual_parameters with _vault_parameters
+        /// </summary>
+        /// <returns> true if there are differences (put into : _diff : dictionary of paramname, ParamPair </returns>
+        /// Retirn 
+        public bool CompareParamsWithVault()
+        {
+            var _differences = _actual_parameters.Except(_vault_parameters);
+            if (_differences.Count() == 0) return false;                    //No differences
+
+            //OK we have differences. Fill up the _diff
+            _diff.Clear(); 
+            foreach (KeyValuePair<string, double> entry in _differences)
+            {
+                var inVaultValue = _vault_parameters[entry.Key];
+                _diff.Add(entry.Key, new ParamPair { inVehicle = entry.Value, inVault = inVaultValue });
+            }
+            return true;
+        }
+
+
 
         public override bool Exit()
         {
             return true;
         }
 
-        private bool is_param_readonly(string parameter_name)
+        private bool IsParamReadOnly(string parameter_name)
         {
-            bool readonly2 = false;
+            bool readonly2;
             var readonly1 = ParameterMetaDataRepository.GetParameterMetaData(parameter_name, ParameterMetaDataConstants.ReadOnly, MainV2.comPort.MAV.cs.firmware.ToString());
             if (readonly1 == String.Empty) return false;
             var _ = bool.TryParse(readonly1, out readonly2);
             return readonly2;
         }
 
-        private bool is_param_ignored(string parameter_name)
+        private bool IsParamIgnored(string parameter_name)
         {
             if (parameter_name == "SYSID_SW_MREV")
                 return true;
@@ -187,6 +230,8 @@ namespace MissionPlanner.RACParamVault
             {
                 if (parameter_name.Substring(0, 4) == "SIM_")
                     return true;
+                if (parameter_name.Substring(0, 4) == "SR0_")
+                    return true;
             }
             if (parameter_name.Length > 11)
             {
@@ -200,7 +245,31 @@ namespace MissionPlanner.RACParamVault
             return false;
         }
 
-        private void update_actual_parameter_list()
+
+        public bool UpdateParamsOnVehicle()
+        {
+            // Get the values in _diff and write paremeters back to vehicle
+            _params_to_update.Clear();
+            foreach (KeyValuePair<string, ParamPair> entry in _diff)
+            {
+                _params_to_update.Add(entry.Key, entry.Value.inVault);
+                Form paramCompareForm = new ParamCompare(null, MainV2.comPort.MAV.param, _params_to_update);
+                paramCompareForm.Text = "Update parameters from VAULT";
+                ThemeManager.ApplyThemeTo(paramCompareForm);
+                var button = paramCompareForm.Controls.Find("BUT_save", true).FirstOrDefault() as MissionPlanner.Controls.MyButton;
+                button.Text = "Write to FC";
+                var dgv = paramCompareForm.Controls.Find("Params", true).FirstOrDefault() as System.Windows.Forms.DataGridView;
+                dgv.Columns[1].HeaderText = "On Vehicle";
+                dgv.Columns[2].HeaderText = "From Vault";
+                paramCompareForm.ShowDialog();
+            }
+
+
+            return true;
+        }
+
+
+        private void GetParamsFromVehicle()
         {
             //Check if all params are loaded
             if (MainV2.comPort.MAV.param.TotalReceived < MainV2.comPort.MAV.param.TotalReported) return;
@@ -211,9 +280,9 @@ namespace MissionPlanner.RACParamVault
             foreach (string item in MainV2.comPort.MAV.param.Keys)
             {
                 //Exclude these readonly fields
-                if (is_param_ignored(item))
+                if (IsParamIgnored(item))
                     continue;
-                if (is_param_readonly(item))
+                if (IsParamReadOnly(item))
                     continue;
 
                 var value = Math.Round(MainV2.comPort.MAV.param[item].Value, 5); //Rounding for 6 decimal digits to overcome stupid double conversion errors.
@@ -221,17 +290,49 @@ namespace MissionPlanner.RACParamVault
             }
         }
 
-        private void but_Click(object sender, EventArgs e)
+
+        public void WriteChangeLog(Changelog action)
         {
-            using (Form NewVaultFile = new NewVaultFile(this))
+            string filename = Settings.GetUserDataDirectory() + Path.GetFileNameWithoutExtension(Settings.FileName) + "_" + MainV2.comPort.MAV.param["BRD_SERIAL_NUM"].Value.ToString() + ".changelog";
+            if (action == Changelog.NewVaultFile)
             {
-                MissionPlanner.Utilities.ThemeManager.ApplyThemeTo(NewVaultFile);
-                NewVaultFile.ShowDialog();
-                Console.WriteLine(NewVaultFile.DialogResult);
+                using (StreamWriter sw = new StreamWriter(File.Open(filename, FileMode.Append)))
+                {
+                    sw.WriteLine(">>> New Vault file created for " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
+                    foreach (KeyValuePair<string, double> entry in _vault_parameters)
+                    {
+                        sw.WriteLine(entry.Key + "," + entry.Value.ToString());
+                    }
+                    sw.WriteLine("<<< End entry " + System.DateTime.Now.ToString());
+                }
+            }
+            else if (action == Changelog.UpdateVehicle)
+            { 
+                using (StreamWriter sw = new StreamWriter(File.Open(filename, FileMode.Append)))
+                {
+                    sw.WriteLine(">>> Vehicle parameters updated " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
+                    foreach (KeyValuePair<string, ParamPair> entry in _diff)
+                    {
+                        sw.WriteLine(entry.Key + " value on Vehicle (" + entry.Value.inVehicle.ToString() + ") <- updated to " + entry.Value.inVault.ToString());
+                    }
+                    sw.WriteLine("<<< End entry " + System.DateTime.Now.ToString());
+                }
+            }
+            else if (action == Changelog.UpdateVault)
+            {
+                using (StreamWriter sw = new StreamWriter(File.Open(filename, FileMode.Append)))
+                {
+                    sw.WriteLine(">>> Vault parameters updated " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
+                    foreach (KeyValuePair<string, ParamPair> entry in _diff)
+                    {
+                        sw.WriteLine(entry.Key + " value in Vault (" + entry.Value.inVault.ToString() + ") <- changed to " + entry.Value.inVehicle.ToString());
+                    }
+                    sw.WriteLine("<<< End entry " + System.DateTime.Now.ToString());
+                }
             }
         }
 
-        private void create_vault_file()
+        public void CreateVaultFile()
         {
             //This will be the filename
             string filename = Settings.GetUserDataDirectory() + Path.GetFileNameWithoutExtension(Settings.FileName) + "_" + MainV2.comPort.MAV.param["BRD_SERIAL_NUM"].Value.ToString() + ".paramvault";
@@ -242,14 +343,10 @@ namespace MissionPlanner.RACParamVault
                 foreach (string item in MainV2.comPort.MAV.param.Keys)
                 {
                     //Exclude these readonly fields
-                    if (is_param_ignored(item))
+                    if (IsParamIgnored(item) || IsParamReadOnly(item))
                         continue;
                     list.Add(item);
                 }
-
-                //Write out remark block
-                //Write out !config-definition
-                //Write out !remark
 
                 sw.WriteLine("#" + " This is a configuration vault file, do not modify directly");
                 sw.WriteLine("#" + " Created : " + System.DateTime.Now.ToString());
@@ -264,7 +361,7 @@ namespace MissionPlanner.RACParamVault
                         return;
                     var val = MainV2.comPort.MAV.param[value].ToString();
                     //Write out only if it is not readonly (defined in Parameter Metadata)
-                    if (!is_param_readonly(value))
+                    if (!IsParamReadOnly(value))
                     {
                         sw.WriteLine(value + "," + val);
                     }
@@ -272,7 +369,7 @@ namespace MissionPlanner.RACParamVault
             }
         }
 
-        public void loadParamFile()
+        public bool LoadVaultFile()
         {
             string filename = Settings.GetUserDataDirectory() + Path.GetFileNameWithoutExtension(Settings.FileName) + "_" + MainV2.comPort.MAV.param["BRD_SERIAL_NUM"].Value.ToString() + ".paramvault";
             _vault_parameters.Clear();
@@ -285,11 +382,20 @@ namespace MissionPlanner.RACParamVault
                     if (line.StartsWith("#"))
                         continue;
                     if (line.StartsWith("!"))
+                    {
+                        vehicle_name = line.Substring(1);
                         continue;
+                    }
                     if (line.StartsWith("@"))
+                    {
+                        vehicle_configuration = line.Substring(1);
                         continue;
+                    }
                     if (line.StartsWith("~"))
+                    {
+                        operator_name = line.Substring(1);
                         continue;
+                    }
 
                     string[] items = line.Split(new char[] { ' ', ',', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -302,7 +408,7 @@ namespace MissionPlanner.RACParamVault
                     {
                         value = double.Parse(items[1], System.Globalization.CultureInfo.InvariantCulture);
                     }
-                    catch (Exception ex)
+                    catch
                     {
                         //log.Error(ex);
                         throw new FormatException("Invalid number on param " + name + " : " + items[1].ToString());
@@ -310,6 +416,19 @@ namespace MissionPlanner.RACParamVault
                     _vault_parameters[name] = value;
                 }
             }
+            return true;
         }
-    }
-}
+
+
+
+
+        private void but_Click(object sender, EventArgs e)
+        {
+
+            WriteChangeLog(Changelog.NewVaultFile);
+
+        }
+
+
+    } //End of Class
+} //End of Namespace

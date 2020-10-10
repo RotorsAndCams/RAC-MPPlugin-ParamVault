@@ -35,7 +35,7 @@
             this.tbName = new System.Windows.Forms.TextBox();
             this.tbConfig = new System.Windows.Forms.TextBox();
             this.tbOperator = new System.Windows.Forms.TextBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.cbSave = new System.Windows.Forms.CheckBox();
             this.lineSeparator1 = new MissionPlanner.Controls.LineSeparator();
             this.bSave = new MissionPlanner.Controls.MyButton();
             this.bCancel = new MissionPlanner.Controls.MyButton();
@@ -99,15 +99,15 @@
             this.tbOperator.Size = new System.Drawing.Size(135, 20);
             this.tbOperator.TabIndex = 6;
             // 
-            // checkBox1
+            // cbSave
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(56, 349);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(207, 17);
-            this.checkBox1.TabIndex = 7;
-            this.checkBox1.Text = "Save current parameters into the Vault";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.cbSave.AutoSize = true;
+            this.cbSave.Location = new System.Drawing.Point(56, 349);
+            this.cbSave.Name = "cbSave";
+            this.cbSave.Size = new System.Drawing.Size(207, 17);
+            this.cbSave.TabIndex = 7;
+            this.cbSave.Text = "Save current parameters into the Vault";
+            this.cbSave.UseVisualStyleBackColor = true;
             // 
             // lineSeparator1
             // 
@@ -146,7 +146,7 @@
             this.Controls.Add(this.bCancel);
             this.Controls.Add(this.bSave);
             this.Controls.Add(this.lineSeparator1);
-            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.cbSave);
             this.Controls.Add(this.tbOperator);
             this.Controls.Add(this.tbConfig);
             this.Controls.Add(this.tbName);
@@ -170,7 +170,7 @@
         private System.Windows.Forms.TextBox tbName;
         private System.Windows.Forms.TextBox tbConfig;
         private System.Windows.Forms.TextBox tbOperator;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox cbSave;
         private Controls.LineSeparator lineSeparator1;
         private Controls.MyButton bSave;
         private Controls.MyButton bCancel;
