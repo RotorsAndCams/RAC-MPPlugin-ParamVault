@@ -38,6 +38,7 @@
             this.bIgnore = new MissionPlanner.Controls.MyButton();
             this.tbOperator = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.bIgnore5min = new MissionPlanner.Controls.MyButton();
             ((System.ComponentModel.ISupportInitialize)(this.dgwParams)).BeginInit();
             this.SuspendLayout();
             // 
@@ -105,7 +106,7 @@
             // 
             // bUpdate_Vault
             // 
-            this.bUpdate_Vault.Location = new System.Drawing.Point(230, 92);
+            this.bUpdate_Vault.Location = new System.Drawing.Point(143, 93);
             this.bUpdate_Vault.Name = "bUpdate_Vault";
             this.bUpdate_Vault.Size = new System.Drawing.Size(111, 23);
             this.bUpdate_Vault.TabIndex = 3;
@@ -115,11 +116,11 @@
             // 
             // bIgnore
             // 
-            this.bIgnore.Location = new System.Drawing.Point(447, 93);
+            this.bIgnore.Location = new System.Drawing.Point(330, 93);
             this.bIgnore.Name = "bIgnore";
-            this.bIgnore.Size = new System.Drawing.Size(111, 23);
+            this.bIgnore.Size = new System.Drawing.Size(111, 35);
             this.bIgnore.TabIndex = 4;
-            this.bIgnore.Text = "IGNORE";
+            this.bIgnore.Text = "IGNORE till next Connect";
             this.bIgnore.UseVisualStyleBackColor = true;
             this.bIgnore.Click += new System.EventHandler(this.bIgnore_Click);
             // 
@@ -139,11 +140,22 @@
             this.label2.TabIndex = 6;
             this.label2.Text = "Operator:";
             // 
+            // bIgnore5min
+            // 
+            this.bIgnore5min.Location = new System.Drawing.Point(447, 93);
+            this.bIgnore5min.Name = "bIgnore5min";
+            this.bIgnore5min.Size = new System.Drawing.Size(111, 35);
+            this.bIgnore5min.TabIndex = 7;
+            this.bIgnore5min.Text = "IGNORE for 3 min";
+            this.bIgnore5min.UseVisualStyleBackColor = true;
+            this.bIgnore5min.Click += new System.EventHandler(this.bIgnore5min_Click);
+            // 
             // ParamDiff
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(570, 420);
+            this.Controls.Add(this.bIgnore5min);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.tbOperator);
             this.Controls.Add(this.bIgnore);
@@ -172,5 +184,6 @@
         private Controls.MyButton bIgnore;
         private System.Windows.Forms.TextBox tbOperator;
         private System.Windows.Forms.Label label2;
+        private Controls.MyButton bIgnore5min;
     }
 }

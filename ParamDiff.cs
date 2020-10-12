@@ -61,5 +61,13 @@ namespace MissionPlanner.RACParamVault
             plugin.WriteChangeLog(Changelog.UpdateVault);
             this.Close();
         }
+
+        private void bIgnore5min_Click(object sender, EventArgs e)
+        {
+            //Instead of ignoring for the rest of session. 
+            //set the nextrun to 5 min from now.
+            plugin.NextRun = DateTime.Now.AddMinutes(3);
+            this.Close();
+        }
     }
 }

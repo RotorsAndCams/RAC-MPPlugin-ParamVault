@@ -1,7 +1,5 @@
 ﻿using MissionPlanner.Controls;
 using MissionPlanner.Utilities;
-using OpenTK.Graphics.ES11;
-using OpenTK.Graphics.ES20;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,7 +22,6 @@ namespace MissionPlanner.RACParamVault
         UpdateVault = 2
     }
 
-
     public class RACParamVaultPlugin : MissionPlanner.Plugin.Plugin
     {
         public string vehicle_name;                //Marked with ! in the vault file
@@ -34,11 +31,10 @@ namespace MissionPlanner.RACParamVault
         public Dictionary<string, double> _actual_parameters = new Dictionary<string, double>();       //This will contains the actual parameter list from the vehicle
         public Dictionary<string, double> _vault_parameters = new Dictionary<string, double>();       //This will contains the actual parameter list from the vehicle
         public Dictionary<string, double> _params_to_update = new Dictionary<string, double>();
-       
-        
+
         //public IEnumerable<KeyValuePair<string, double>> _differences = new Dictionary<string, double>();
 
-        public Dictionary<string, ParamPair> _diff = new Dictionary<string, ParamPair>();        
+        public Dictionary<string, ParamPair> _diff = new Dictionary<string, ParamPair>();
 
         private ToolStripMenuItem but;
 
@@ -131,7 +127,6 @@ namespace MissionPlanner.RACParamVault
                             LoadVaultFile();        //TODO: add error handling
                             WriteChangeLog(Changelog.NewVaultFile);   //Update Changelog with the new vaultfile (for reference all params are stored at the begining)
                             _vault_loaded = true;
-
                         }
                     }
                 }
@@ -162,18 +157,19 @@ namespace MissionPlanner.RACParamVault
 
             return true;
         }
+
         /// <summary>
         /// Compare parameters in _actual_parameters with _vault_parameters
         /// </summary>
         /// <returns> true if there are differences (put into : _diff : dictionary of paramname, ParamPair </returns>
-        /// Retirn 
+        /// Retirn
         public bool CompareParamsWithVault()
         {
             var _differences = _actual_parameters.Except(_vault_parameters);
             if (_differences.Count() == 0) return false;                    //No differences
 
             //OK we have differences. Fill up the _diff
-            _diff.Clear(); 
+            _diff.Clear();
             foreach (KeyValuePair<string, double> entry in _differences)
             {
                 var inVaultValue = _vault_parameters[entry.Key];
@@ -181,8 +177,6 @@ namespace MissionPlanner.RACParamVault
             }
             return true;
         }
-
-
 
         public override bool Exit()
         {
@@ -245,7 +239,6 @@ namespace MissionPlanner.RACParamVault
             return false;
         }
 
-
         public bool UpdateParamsOnVehicle()
         {
             // Get the values in _diff and write paremeters back to vehicle
@@ -264,10 +257,8 @@ namespace MissionPlanner.RACParamVault
                 paramCompareForm.ShowDialog();
             }
 
-
             return true;
         }
-
 
         private void GetParamsFromVehicle()
         {
@@ -279,7 +270,6 @@ namespace MissionPlanner.RACParamVault
 
             foreach (string item in MainV2.comPort.MAV.param.Keys)
             {
-                //Exclude these readonly fields
                 if (IsParamIgnored(item))
                     continue;
                 if (IsParamReadOnly(item))
@@ -290,45 +280,30 @@ namespace MissionPlanner.RACParamVault
             }
         }
 
-
         public void WriteChangeLog(Changelog action)
         {
             string filename = Settings.GetUserDataDirectory() + Path.GetFileNameWithoutExtension(Settings.FileName) + "_" + MainV2.comPort.MAV.param["BRD_SERIAL_NUM"].Value.ToString() + ".changelog";
-            if (action == Changelog.NewVaultFile)
+            using (StreamWriter sw = new StreamWriter(File.Open(filename, FileMode.Append)))
             {
-                using (StreamWriter sw = new StreamWriter(File.Open(filename, FileMode.Append)))
+                if (action == Changelog.NewVaultFile)
                 {
                     sw.WriteLine(">>> New Vault file created for " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
                     foreach (KeyValuePair<string, double> entry in _vault_parameters)
-                    {
                         sw.WriteLine(entry.Key + "," + entry.Value.ToString());
-                    }
-                    sw.WriteLine("<<< End entry " + System.DateTime.Now.ToString());
                 }
-            }
-            else if (action == Changelog.UpdateVehicle)
-            { 
-                using (StreamWriter sw = new StreamWriter(File.Open(filename, FileMode.Append)))
+                else if (action == Changelog.UpdateVehicle)
                 {
                     sw.WriteLine(">>> Vehicle parameters updated " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
                     foreach (KeyValuePair<string, ParamPair> entry in _diff)
-                    {
                         sw.WriteLine(entry.Key + " value on Vehicle (" + entry.Value.inVehicle.ToString() + ") <- updated to " + entry.Value.inVault.ToString());
-                    }
-                    sw.WriteLine("<<< End entry " + System.DateTime.Now.ToString());
                 }
-            }
-            else if (action == Changelog.UpdateVault)
-            {
-                using (StreamWriter sw = new StreamWriter(File.Open(filename, FileMode.Append)))
+                else if (action == Changelog.UpdateVault)
                 {
                     sw.WriteLine(">>> Vault parameters updated " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
                     foreach (KeyValuePair<string, ParamPair> entry in _diff)
-                    {
                         sw.WriteLine(entry.Key + " value in Vault (" + entry.Value.inVault.ToString() + ") <- changed to " + entry.Value.inVehicle.ToString());
-                    }
-                    sw.WriteLine("<<< End entry " + System.DateTime.Now.ToString());
                 }
+                sw.WriteLine("<<< End entry " + System.DateTime.Now.ToString());
             }
         }
 
@@ -419,16 +394,9 @@ namespace MissionPlanner.RACParamVault
             return true;
         }
 
-
-
-
         private void but_Click(object sender, EventArgs e)
         {
-
             WriteChangeLog(Changelog.NewVaultFile);
-
         }
-
-
     } //End of Class
 } //End of Namespace
