@@ -1,4 +1,4 @@
-﻿namespace MissionPlanner.RACParamVault
+﻿namespace RACParamVault
 {
     partial class NewVaultFile
     {
@@ -171,8 +171,8 @@
         private System.Windows.Forms.TextBox tbConfig;
         private System.Windows.Forms.TextBox tbOperator;
         private System.Windows.Forms.CheckBox cbSave;
-        private Controls.LineSeparator lineSeparator1;
-        private Controls.MyButton bSave;
-        private Controls.MyButton bCancel;
+        private MissionPlanner.Controls.LineSeparator lineSeparator1;
+        private MissionPlanner.Controls.MyButton bSave;
+        private MissionPlanner.Controls.MyButton bCancel;
     }
 }

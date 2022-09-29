@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using MissionPlanner;
 
-namespace MissionPlanner.RACParamVault
+namespace RACParamVault
 {
     public partial class ParamDiff : Form
     {
@@ -31,17 +32,28 @@ namespace MissionPlanner.RACParamVault
         private void bIgnore_Click(object sender, EventArgs e)
         {
             plugin._vault_ignored = true;
+            if (tbOperator.Text.Length == 0 || textBoxDescription.MaxLength == 0)
+            {
+                label2.ForeColor = Color.Red;
+                label3.ForeColor = Color.Red;
+                return;
+            }
+            plugin.operator_name = tbOperator.Text;
+            plugin.desc_of_change = textBoxDescription.Text;
+            plugin.WriteChangeLog(Changelog.IgonoreChangesOnVehicle);
             this.Close();
         }
 
         private void bUpdateVehicle_Click(object sender, EventArgs e)
         {
-            if (tbOperator.Text.Length == 0)
+            if (tbOperator.Text.Length == 0 || textBoxDescription.MaxLength == 0)
             {
                 label2.ForeColor = Color.Red;
+                label3.ForeColor = Color.Red;
                 return;
             }
             plugin.operator_name = tbOperator.Text;
+            plugin.desc_of_change = textBoxDescription.Text;
             plugin.UpdateParamsOnVehicle();
             plugin.WriteChangeLog(Changelog.UpdateVehicle);
             this.Close();
@@ -50,12 +62,14 @@ namespace MissionPlanner.RACParamVault
 
         private void bUpdate_Vault_Click(object sender, EventArgs e)
         {
-            if (tbOperator.Text.Length == 0)
+            if (tbOperator.Text.Length == 0 || textBoxDescription.MaxLength == 0)
             {
                 label2.ForeColor = Color.Red;
+                label3.ForeColor = Color.Red;
                 return;
             }
             plugin.operator_name = tbOperator.Text;
+            plugin.desc_of_change = textBoxDescription.Text;
             plugin.CreateVaultFile(); //TODO: Add error handling
             plugin.LoadVaultFile();
             plugin.WriteChangeLog(Changelog.UpdateVault);

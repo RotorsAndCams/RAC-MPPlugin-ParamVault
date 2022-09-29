@@ -8,8 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MissionPlanner.Controls;
+using MissionPlanner;
 
-namespace MissionPlanner.RACParamVault
+namespace RACParamVault
 {
     public partial class NewVaultFile : Form
     {

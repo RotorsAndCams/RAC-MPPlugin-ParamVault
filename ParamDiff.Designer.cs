@@ -1,4 +1,6 @@
-﻿namespace MissionPlanner.RACParamVault
+﻿using MissionPlanner.Controls;
+
+namespace RACParamVault
 {
     partial class ParamDiff
     {
@@ -39,6 +41,8 @@
             this.tbOperator = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.bIgnore5min = new MissionPlanner.Controls.MyButton();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBoxDescription = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgwParams)).BeginInit();
             this.SuspendLayout();
             // 
@@ -54,10 +58,10 @@
             this.parameter,
             this.value_on_vehicle,
             this.value_in_vault});
-            this.dgwParams.Location = new System.Drawing.Point(12, 169);
+            this.dgwParams.Location = new System.Drawing.Point(12, 243);
             this.dgwParams.Name = "dgwParams";
             this.dgwParams.ReadOnly = true;
-            this.dgwParams.Size = new System.Drawing.Size(547, 243);
+            this.dgwParams.Size = new System.Drawing.Size(547, 289);
             this.dgwParams.TabIndex = 0;
             // 
             // parameter
@@ -150,11 +154,30 @@
             this.bIgnore5min.UseVisualStyleBackColor = true;
             this.bIgnore5min.Click += new System.EventHandler(this.bIgnore5min_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(12, 162);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(35, 13);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "Desc:";
+            // 
+            // textBoxDescription
+            // 
+            this.textBoxDescription.Location = new System.Drawing.Point(69, 162);
+            this.textBoxDescription.Multiline = true;
+            this.textBoxDescription.Name = "textBoxDescription";
+            this.textBoxDescription.Size = new System.Drawing.Size(489, 75);
+            this.textBoxDescription.TabIndex = 9;
+            // 
             // ParamDiff
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(570, 420);
+            this.ClientSize = new System.Drawing.Size(570, 540);
+            this.Controls.Add(this.textBoxDescription);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.bIgnore5min);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.tbOperator);
@@ -179,11 +202,13 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn value_on_vehicle;
         private System.Windows.Forms.DataGridViewTextBoxColumn value_in_vault;
         private System.Windows.Forms.Label label1;
-        private Controls.MyButton bUpdateVehicle;
-        private Controls.MyButton bUpdate_Vault;
-        private Controls.MyButton bIgnore;
+        private MyButton bUpdateVehicle;
+        private MyButton bUpdate_Vault;
+        private MyButton bIgnore;
         private System.Windows.Forms.TextBox tbOperator;
         private System.Windows.Forms.Label label2;
-        private Controls.MyButton bIgnore5min;
+        private MyButton bIgnore5min;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textBoxDescription;
     }
 }

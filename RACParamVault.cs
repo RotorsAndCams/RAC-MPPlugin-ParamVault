@@ -1,13 +1,16 @@
-﻿using MissionPlanner.Controls;
-using MissionPlanner.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using MissionPlanner;
+using MissionPlanner.Controls;
+using MissionPlanner.Utilities;
+using MissionPlanner.plugins;
+using System.Globalization;
 
-namespace MissionPlanner.RACParamVault
+namespace RACParamVault
 {
     public class ParamPair
     {
@@ -19,7 +22,8 @@ namespace MissionPlanner.RACParamVault
     {
         NewVaultFile = 0,
         UpdateVehicle = 1,
-        UpdateVault = 2
+        UpdateVault = 2,
+        IgonoreChangesOnVehicle = 3
     }
 
     public class RACParamVaultPlugin : MissionPlanner.Plugin.Plugin
@@ -27,6 +31,7 @@ namespace MissionPlanner.RACParamVault
         public string vehicle_name;                //Marked with ! in the vault file
         public string vehicle_configuration;       //Marked with @ in the vault file
         public string operator_name;               //Marked with ~ in the vault file
+        public string desc_of_change;              //Description field in the changelog 
 
         public Dictionary<string, double> _actual_parameters = new Dictionary<string, double>();       //This will contains the actual parameter list from the vehicle
         public Dictionary<string, double> _vault_parameters = new Dictionary<string, double>();       //This will contains the actual parameter list from the vehicle
@@ -172,8 +177,18 @@ namespace MissionPlanner.RACParamVault
             _diff.Clear();
             foreach (KeyValuePair<string, double> entry in _differences)
             {
-                var inVaultValue = _vault_parameters[entry.Key];
-                _diff.Add(entry.Key, new ParamPair { inVehicle = entry.Value, inVault = inVaultValue });
+                double outValue;
+                if (_vault_parameters.TryGetValue(entry.Key, out outValue))
+                {
+                    _diff.Add(entry.Key, new ParamPair { inVehicle = entry.Value, inVault = outValue });
+                }
+                else
+                {
+                    _diff.Add(entry.Key, new ParamPair { inVehicle = entry.Value, inVault = 0 });
+                }
+
+                //var inVaultValue = _vault_parameters[entry.Key];
+                //_diff.Add(entry.Key, new ParamPair { inVehicle = entry.Value, inVault = inVaultValue });
             }
             return true;
         }
@@ -289,20 +304,28 @@ namespace MissionPlanner.RACParamVault
                 {
                     sw.WriteLine(">>> New Vault file created for " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
                     foreach (KeyValuePair<string, double> entry in _vault_parameters)
-                        sw.WriteLine(entry.Key + "," + entry.Value.ToString());
+                        sw.WriteLine(entry.Key + "," + entry.Value.ToString("G",CultureInfo.InvariantCulture));
                 }
                 else if (action == Changelog.UpdateVehicle)
                 {
                     sw.WriteLine(">>> Vehicle parameters updated " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
                     foreach (KeyValuePair<string, ParamPair> entry in _diff)
-                        sw.WriteLine(entry.Key + " value on Vehicle (" + entry.Value.inVehicle.ToString() + ") <- updated to " + entry.Value.inVault.ToString());
+                        sw.WriteLine(entry.Key + " value on Vehicle (" + entry.Value.inVehicle.ToString("G", CultureInfo.InvariantCulture) + ") <- updated to " + entry.Value.inVault.ToString("G", CultureInfo.InvariantCulture));
                 }
                 else if (action == Changelog.UpdateVault)
                 {
                     sw.WriteLine(">>> Vault parameters updated " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
                     foreach (KeyValuePair<string, ParamPair> entry in _diff)
-                        sw.WriteLine(entry.Key + " value in Vault (" + entry.Value.inVault.ToString() + ") <- changed to " + entry.Value.inVehicle.ToString());
+                        sw.WriteLine(entry.Key + " value in Vault (" + entry.Value.inVault.ToString("G", CultureInfo.InvariantCulture) + ") <- changed to " + entry.Value.inVehicle.ToString("G", CultureInfo.InvariantCulture));
                 }
+                else if (action == Changelog.IgonoreChangesOnVehicle)
+                {
+                    sw.WriteLine(">>> Changes on vehicle ignored " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
+                    foreach (KeyValuePair<string, ParamPair> entry in _diff)
+                        sw.WriteLine(entry.Key + " value on Vehicle (" + entry.Value.inVehicle.ToString("G", CultureInfo.InvariantCulture) + ") <-> in Vault " + entry.Value.inVault.ToString("G", CultureInfo.InvariantCulture));
+                }
+
+
                 sw.WriteLine("<<< End entry " + System.DateTime.Now.ToString());
             }
         }
@@ -334,11 +357,11 @@ namespace MissionPlanner.RACParamVault
                 {
                     if (value == null || value == "")
                         return;
-                    var val = MainV2.comPort.MAV.param[value].ToString();
+                    double val = MainV2.comPort.MAV.param[value].GetValue();
                     //Write out only if it is not readonly (defined in Parameter Metadata)
                     if (!IsParamReadOnly(value))
                     {
-                        sw.WriteLine(value + "," + val);
+                        sw.WriteLine(value + "," + val.ToString("G",CultureInfo.InvariantCulture));
                     }
                 }
             }
