@@ -61,7 +61,7 @@ namespace RACParamVault
             this.dgwParams.Location = new System.Drawing.Point(12, 243);
             this.dgwParams.Name = "dgwParams";
             this.dgwParams.ReadOnly = true;
-            this.dgwParams.Size = new System.Drawing.Size(547, 289);
+            this.dgwParams.Size = new System.Drawing.Size(547, 409);
             this.dgwParams.TabIndex = 0;
             // 
             // parameter
@@ -175,7 +175,7 @@ namespace RACParamVault
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(570, 540);
+            this.ClientSize = new System.Drawing.Size(570, 660);
             this.Controls.Add(this.textBoxDescription);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.bIgnore5min);

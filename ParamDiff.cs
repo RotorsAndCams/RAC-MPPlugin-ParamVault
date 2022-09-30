@@ -20,8 +20,8 @@ namespace RACParamVault
                 dgwParams.Rows.Add(entry.Key, entry.Value.inVehicle.ToString(), entry.Value.inVault.ToString());
             }
 
-            this.Height = (dgwParams.PreferredSize.Height + 190) > 600 ? 600 : (dgwParams.PreferredSize.Height + 190);
-            Console.WriteLine(this.Height);
+            //this.Height = (dgwParams.PreferredSize.Height + 190) > 600 ? 600 : (dgwParams.PreferredSize.Height + 190);
+            //Console.WriteLine(this.Height);
 
             label1.Text = "Parameters stored in the vault for this vehicle " +
                           "are different from current ones.\r\nPlease select how to proceed!\r\n" +
@@ -56,6 +56,7 @@ namespace RACParamVault
             plugin.desc_of_change = textBoxDescription.Text;
             plugin.UpdateParamsOnVehicle();
             plugin.WriteChangeLog(Changelog.UpdateVehicle);
+            plugin._vault_ignored = false;
             this.Close();
 
         }
@@ -73,6 +74,7 @@ namespace RACParamVault
             plugin.CreateVaultFile(); //TODO: Add error handling
             plugin.LoadVaultFile();
             plugin.WriteChangeLog(Changelog.UpdateVault);
+            plugin._vault_ignored = false;
             this.Close();
         }
 
@@ -81,6 +83,7 @@ namespace RACParamVault
             //Instead of ignoring for the rest of session. 
             //set the nextrun to 5 min from now.
             plugin.NextRun = DateTime.Now.AddMinutes(3);
+            plugin._vault_ignored = false;
             this.Close();
         }
     }

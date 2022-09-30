@@ -120,7 +120,9 @@ namespace RACParamVault
                     using (Form NewVaultFile = new NewVaultFile(this))
                     {
                         MissionPlanner.Utilities.ThemeManager.ApplyThemeTo(NewVaultFile);
+                        _vault_ignored = true; //Ignore further checks during the dialog box
                         NewVaultFile.ShowDialog();
+                        _vault_ignored = false;
                         if ((NewVaultFile.DialogResult == DialogResult.No) || (NewVaultFile.DialogResult == DialogResult.Cancel))
                         {
                             _vault_ignored = true;
@@ -152,6 +154,7 @@ namespace RACParamVault
                 if (CompareParamsWithVault())              // There are differences in the actual config and the Vault
 
                 {
+                    _vault_ignored = true;  //Do not reopen during dialog box
                     using (Form ParamDiff = new ParamDiff(this))
                     {
                         MissionPlanner.Utilities.ThemeManager.ApplyThemeTo(ParamDiff);
@@ -297,36 +300,52 @@ namespace RACParamVault
 
         public void WriteChangeLog(Changelog action)
         {
-            string filename = Settings.GetUserDataDirectory() + Path.GetFileNameWithoutExtension(Settings.FileName) + "_" + MainV2.comPort.MAV.param["BRD_SERIAL_NUM"].Value.ToString() + ".changelog";
+            string filename = Settings.GetUserDataDirectory() + Path.GetFileNameWithoutExtension(Settings.FileName) + "_" + MainV2.comPort.MAV.param["BRD_SERIAL_NUM"].Value.ToString() + ".changelog.xml";
+
+            if (!File.Exists(filename))
+            {
+                //Add XML header
+                using (StreamWriter sw = new StreamWriter(File.Open(filename, FileMode.Append)))
+                {
+                    sw.WriteLine(@"<?xml version=""1.0"" encoding=""utf-8""?>");
+                    sw.WriteLine(@"<!-- There is no closing Changelog node due the nature of the log -->");
+                    sw.WriteLine("<Changelog>");
+                }
+            }
             using (StreamWriter sw = new StreamWriter(File.Open(filename, FileMode.Append)))
             {
+                sw.WriteLine(@"<Logentry>");
+                sw.WriteLine("\t<Action>" + action.ToString() + "</Action>");
+                sw.WriteLine("\t<Timestamp>" + System.DateTime.Now.ToString("yyyy-mm-dd-hh:mm") + "</Timestamp>");
+                sw.WriteLine("\t<Operator>" + operator_name + "</Operator>");
+                sw.WriteLine("\t<Config>" + vehicle_configuration + "</Config>");
+                sw.WriteLine("\t<Vehicle_name>" + vehicle_name + "</Vehicle_name>");
+                sw.WriteLine("\t<Description>" + desc_of_change + "</Description>");
+
+                sw.WriteLine("\t<Changes>");
+
                 if (action == Changelog.NewVaultFile)
                 {
-                    sw.WriteLine(">>> New Vault file created for " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
                     foreach (KeyValuePair<string, double> entry in _vault_parameters)
                         sw.WriteLine(entry.Key + "," + entry.Value.ToString("G",CultureInfo.InvariantCulture));
                 }
                 else if (action == Changelog.UpdateVehicle)
                 {
-                    sw.WriteLine(">>> Vehicle parameters updated " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
                     foreach (KeyValuePair<string, ParamPair> entry in _diff)
                         sw.WriteLine(entry.Key + " value on Vehicle (" + entry.Value.inVehicle.ToString("G", CultureInfo.InvariantCulture) + ") <- updated to " + entry.Value.inVault.ToString("G", CultureInfo.InvariantCulture));
                 }
                 else if (action == Changelog.UpdateVault)
                 {
-                    sw.WriteLine(">>> Vault parameters updated " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
                     foreach (KeyValuePair<string, ParamPair> entry in _diff)
                         sw.WriteLine(entry.Key + " value in Vault (" + entry.Value.inVault.ToString("G", CultureInfo.InvariantCulture) + ") <- changed to " + entry.Value.inVehicle.ToString("G", CultureInfo.InvariantCulture));
                 }
                 else if (action == Changelog.IgonoreChangesOnVehicle)
                 {
-                    sw.WriteLine(">>> Changes on vehicle ignored " + vehicle_configuration + "/" + vehicle_name + " on " + System.DateTime.Now.ToString() + " by " + operator_name);
                     foreach (KeyValuePair<string, ParamPair> entry in _diff)
                         sw.WriteLine(entry.Key + " value on Vehicle (" + entry.Value.inVehicle.ToString("G", CultureInfo.InvariantCulture) + ") <-> in Vault " + entry.Value.inVault.ToString("G", CultureInfo.InvariantCulture));
                 }
-
-
-                sw.WriteLine("<<< End entry " + System.DateTime.Now.ToString());
+                sw.WriteLine("</Changes>");
+                sw.WriteLine(@"</Logentry>");
             }
         }
 
