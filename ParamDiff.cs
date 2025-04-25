@@ -8,12 +8,13 @@ namespace RACParamVault
 {
     public partial class ParamDiff : Form
     {
-        RACParamVaultPlugin plugin;
+        private RACParamVaultPlugin _plugin;
 
         public ParamDiff(RACParamVaultPlugin plugin)
         {
+            this._plugin = plugin;
+
             InitializeComponent();
-            this.plugin = plugin;
 
             foreach (KeyValuePair<string, ParamPair> entry in plugin._diff)
             {
@@ -31,16 +32,16 @@ namespace RACParamVault
 
         private void bIgnore_Click(object sender, EventArgs e)
         {
-            plugin._vault_ignored = true;
+            _plugin._vault_ignored = true;
             if (tbOperator.Text.Length == 0 || textBoxDescription.MaxLength == 0)
             {
                 label2.ForeColor = Color.Red;
                 label3.ForeColor = Color.Red;
                 return;
             }
-            plugin.operator_name = tbOperator.Text;
-            plugin.desc_of_change = textBoxDescription.Text;
-            plugin.WriteChangeLog(Changelog.IgonoreChangesOnVehicle);
+            _plugin.operator_name = tbOperator.Text;
+            _plugin.desc_of_change = textBoxDescription.Text;
+            _plugin.WriteChangeLog(Changelog.IgonoreChangesOnVehicle);
             this.Close();
         }
 
@@ -52,13 +53,12 @@ namespace RACParamVault
                 label3.ForeColor = Color.Red;
                 return;
             }
-            plugin.operator_name = tbOperator.Text;
-            plugin.desc_of_change = textBoxDescription.Text;
-            plugin.UpdateParamsOnVehicle();
-            plugin.WriteChangeLog(Changelog.UpdateVehicle);
-            plugin._vault_ignored = false;
+            _plugin.operator_name = tbOperator.Text;
+            _plugin.desc_of_change = textBoxDescription.Text;
+            _plugin.UpdateParamsOnVehicle();
+            _plugin.WriteChangeLog(Changelog.UpdateVehicle);
+            _plugin._vault_ignored = false;
             this.Close();
-
         }
 
         private void bUpdate_Vault_Click(object sender, EventArgs e)
@@ -69,21 +69,21 @@ namespace RACParamVault
                 label3.ForeColor = Color.Red;
                 return;
             }
-            plugin.operator_name = tbOperator.Text;
-            plugin.desc_of_change = textBoxDescription.Text;
-            plugin.CreateVaultFile(); //TODO: Add error handling
-            plugin.LoadVaultFile();
-            plugin.WriteChangeLog(Changelog.UpdateVault);
-            plugin._vault_ignored = false;
+            _plugin.operator_name = tbOperator.Text;
+            _plugin.desc_of_change = textBoxDescription.Text;
+            _plugin.CreateVaultFile(); // TODO: Add error handling
+            _plugin.LoadVaultFile();
+            _plugin.WriteChangeLog(Changelog.UpdateVault);
+            _plugin._vault_ignored = false;
             this.Close();
         }
 
         private void bIgnore5min_Click(object sender, EventArgs e)
         {
-            //Instead of ignoring for the rest of session. 
-            //set the nextrun to 5 min from now.
-            plugin.NextRun = DateTime.Now.AddMinutes(3);
-            plugin._vault_ignored = false;
+            // Instead of ignoring for the rest of session. 
+            // set the nextrun to 5 min from now.
+            _plugin.NextRun = DateTime.Now.AddMinutes(3);
+            _plugin._vault_ignored = false;
             this.Close();
         }
     }

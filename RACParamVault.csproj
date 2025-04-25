@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DDD2FEA8-801E-463B-8913-9CCCDA2D9429}</ProjectGuid>
+    <ProjectGuid>{11D3CEC1-863A-47F1-A079-0B9939605656}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>MissionPlanner.RACParamVault</RootNamespace>
-    <AssemblyName>MissionPlanner.RACParamVault</AssemblyName>
+    <AssemblyName>RAC-ParamVault</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -51,19 +51,19 @@
       <Project>{9ca367b8-0b98-49d1-84fb-735e612e3ba9}</Project>
       <Name>BSE.Windows.Forms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\mp-latest-dev\ExtLibs\ArduPilot\MissionPlanner.ArduPilot.csproj">
+    <ProjectReference Include="..\..\ExtLibs\ArduPilot\MissionPlanner.ArduPilot.csproj">
       <Project>{ca6345d3-7a6d-478b-a0ed-a58e50dcaa83}</Project>
       <Name>MissionPlanner.ArduPilot</Name>
     </ProjectReference>
-    <ProjectReference Include="..\mp-latest-dev\ExtLibs\Comms\MissionPlanner.Comms.csproj">
+    <ProjectReference Include="..\..\ExtLibs\Comms\MissionPlanner.Comms.csproj">
       <Project>{825e7a10-390c-4a2b-b3a8-491d14966912}</Project>
       <Name>MissionPlanner.Comms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\mp-latest-dev\ExtLibs\Controls\MissionPlanner.Controls.csproj">
+    <ProjectReference Include="..\..\ExtLibs\Controls\MissionPlanner.Controls.csproj">
       <Project>{c8b88795-6d01-494d-83ad-6944bd4c5023}</Project>
       <Name>MissionPlanner.Controls</Name>
     </ProjectReference>
-    <ProjectReference Include="..\mp-latest-dev\ExtLibs\Core\Core.csproj">
+    <ProjectReference Include="..\..\ExtLibs\Core\Core.csproj">
       <Project>{59129078-7b12-4198-b93e-0aa08d0bb7ed}</Project>
       <Name>Core</Name>
     </ProjectReference>
@@ -75,23 +75,23 @@
       <Project>{7f7994ce-823f-4a04-bbea-d0a3808ff56d}</Project>
       <Name>GeoUtility</Name>
     </ProjectReference>
-    <ProjectReference Include="..\mp-latest-dev\ExtLibs\GMap.NET.Core\GMap.NET.Core.csproj">
+    <ProjectReference Include="..\..\ExtLibs\GMap.NET.Core\GMap.NET.Core.csproj">
       <Project>{d0c39d9d-bed0-418b-9a5e-713176caf40c}</Project>
       <Name>GMap.NET.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\mp-latest-dev\ExtLibs\GMap.NET.WindowsForms\GMap.NET.WindowsForms.csproj">
+    <ProjectReference Include="..\..\ExtLibs\GMap.NET.WindowsForms\GMap.NET.WindowsForms.csproj">
       <Project>{e06def77-f933-42fb-afd7-db2d0d8d6a98}</Project>
       <Name>GMap.NET.WindowsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\mp-latest-dev\ExtLibs\Strings\MissionPlanner.Strings.csproj">
+    <ProjectReference Include="..\..\ExtLibs\Strings\MissionPlanner.Strings.csproj">
       <Project>{a0de147b-144c-4a34-8d46-9394570ad7e8}</Project>
       <Name>MissionPlanner.Strings</Name>
     </ProjectReference>
-    <ProjectReference Include="..\mp-latest-dev\ExtLibs\Utilities\MissionPlanner.Utilities.csproj">
+    <ProjectReference Include="..\..\ExtLibs\Utilities\MissionPlanner.Utilities.csproj">
       <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
       <Name>MissionPlanner.Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\mp-latest-dev\MissionPlanner.csproj">
+    <ProjectReference Include="..\..\MissionPlanner.csproj">
       <Project>{a2e22272-95fe-47b6-b050-9ae7e2055bf5}</Project>
       <Name>MissionPlanner</Name>
     </ProjectReference>

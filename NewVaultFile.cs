@@ -1,35 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using MissionPlanner.Controls;
-using MissionPlanner;
 
 namespace RACParamVault
 {
     public partial class NewVaultFile : Form
     {
+        private RACParamVaultPlugin _plugin;
 
-        private RACParamVaultPlugin plugin;
-
-        public NewVaultFile(RACParamVaultPlugin _plugin)
+        public NewVaultFile(RACParamVaultPlugin plugin)
         {
-            plugin = _plugin;
+            _plugin = plugin;
+
             InitializeComponent();
+
             label1.Text = "There is no param file in the Vault for the current MP config/Vehicle BRD_ID\r\n" +
-                           "( " + plugin.vehicle_configuration + " / " + MainV2.comPort.MAV.param["BRD_SERIAL_NUM"] + " )\r\n\r\n" +
+                           "( " + this._plugin.vehicle_configuration + " / " + this._plugin.Host.comPort.MAV.param["BRD_SERIAL_NUM"] + " )\r\n\r\n" +
                            "To save current parameters into the Vault,\r\nenter data and press Save.\r\n" +
                            "To ignore Vault check until next Connect, press Cancel.";
-            tbName.Text = plugin.vehicle_name;
-            tbConfig.Text = plugin.vehicle_configuration;
-            tbOperator.Text = plugin.operator_name;
-
-
+            tbName.Text = this._plugin.vehicle_name;
+            tbConfig.Text = this._plugin.vehicle_configuration;
+            tbOperator.Text = this._plugin.operator_name;
         }
 
         private void bCancel_Click(object sender, EventArgs e)
@@ -41,12 +32,11 @@ namespace RACParamVault
                 this.DialogResult = DialogResult.Cancel;
                 this.Close();
             }
-
         }
 
         private void bSave_Click(object sender, EventArgs e)
         {
-            //Check fields
+            // Check fields
 
             Color original = label1.ForeColor;
 
@@ -58,9 +48,9 @@ namespace RACParamVault
 
             if (bOK)
             {
-                plugin.vehicle_name = tbName.Text;
-                plugin.vehicle_configuration = tbConfig.Text;
-                plugin.operator_name = tbOperator.Text;
+                _plugin.vehicle_name = tbName.Text;
+                _plugin.vehicle_configuration = tbConfig.Text;
+                _plugin.operator_name = tbOperator.Text;
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();
